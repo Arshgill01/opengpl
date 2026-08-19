@@ -51,6 +51,10 @@ export type EvidenceIssue = {
 
 export const surveyVersion = "triangle-2026-v1";
 
+export function callingContext(phone: string) {
+  return phone.startsWith("+91") ? { region: "IN", locale: "en-IN" } : { region: "US", locale: "en-US" };
+}
+
 export const recipientResultSchema = {
   type: "object",
   required: [

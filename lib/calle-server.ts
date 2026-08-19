@@ -1,7 +1,7 @@
 import "server-only";
 
 import { CalleClient } from "@call-e/calle";
-import { buildCallTask, recipientResultSchema, stableIntentKey, type Provider } from "./opengpl";
+import { buildCallTask, callingContext, recipientResultSchema, stableIntentKey, type Provider } from "./opengpl";
 
 const liveMode = "operator-prototype";
 
@@ -33,10 +33,12 @@ export async function createSurveyCall(provider: Provider) {
   const webhookUrl = process.env.OPENGPL_WEBHOOK_URL;
   if (webhookUrl && !webhookUrl.startsWith("https://")) throw new Error("OPENGPL_WEBHOOK_URL must use HTTPS.");
 
+  const { region, locale } = callingContext(provider.phone);
+
   return client().calls.create(
     {
       task: buildCallTask(provider.name),
-      recipients: [{ phones: [provider.phone], region: "US", locale: "en-US" }],
+      recipients: [{ phones: [provider.phone], region, locale }],
       recipientResultSchema,
       metadata: {
         workflow: "opengpl",

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { initialCases } from "../lib/fixtures";
-import { buildCallTask, exportApprovedCsv, parseProviderCsv, reviewEvidence, stableIntentKey } from "../lib/opengpl";
+import { buildCallTask, callingContext, exportApprovedCsv, parseProviderCsv, reviewEvidence, stableIntentKey } from "../lib/opengpl";
 
 test("clear fixture passes the evidence gate", () => {
   const item = initialCases[0];
@@ -56,6 +56,11 @@ test("call task states disclosure and scope boundaries", () => {
   assert.match(task, /transcribed/u);
   assert.match(task, /Do not say that anyone has died/u);
   assert.match(task, /Do not make arrangements/u);
+});
+
+test("calling context uses the recipient's supported region", () => {
+  assert.deepEqual(callingContext("+918437958613"), { region: "IN", locale: "en-IN" });
+  assert.deepEqual(callingContext("+12025550141"), { region: "US", locale: "en-US" });
 });
 
 test("intent key is stable for the same survey and provider", () => {
