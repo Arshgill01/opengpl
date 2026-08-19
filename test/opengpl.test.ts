@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { initialCases } from "../lib/fixtures";
-import { buildCallTask, callingContext, exportApprovedCsv, parseProviderCsv, reviewEvidence, stableIntentKey } from "../lib/opengpl";
+import { buildCallTask, callingContext, exportApprovedCsv, parseProviderCsv, reviewCaseEvidence, reviewEvidence, stableIntentKey } from "../lib/opengpl";
 
 test("clear fixture passes the evidence gate", () => {
   const item = initialCases[0];
@@ -22,6 +22,17 @@ test("unsupported extracted amounts block approval", () => {
   const issues = reviewEvidence(item.result, item.transcript, item.confidence);
   assert.ok(issues.some((issue) => issue.field === "immediate_burial" && issue.severity === "block"));
   assert.ok(issues.some((issue) => issue.field === "direct_cremation" && issue.severity === "block"));
+});
+
+test("a declined platform outcome cannot be published as no answer", () => {
+  const item = initialCases[0];
+  const issues = reviewCaseEvidence({
+    ...item,
+    callStatus: "failed",
+    result: item.result ? { ...item.result, reachOutcome: "no_answer" } : null,
+    failureMessage: "calling task status=DECLINED (Hangup by: user)"
+  });
+  assert.ok(issues.some((issue) => issue.field === "terminal_disposition" && issue.severity === "block"));
 });
 
 test("CSV import requires E.164 and preserves quoted names", () => {

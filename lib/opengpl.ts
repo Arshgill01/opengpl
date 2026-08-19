@@ -41,6 +41,8 @@ export type SurveyCase = {
   transcript: TranscriptTurn[];
   reviewDecision: ReviewDecision;
   reviewerNote: string;
+  platformSummary?: string;
+  failureMessage?: string;
 };
 
 export type EvidenceIssue = {
@@ -156,6 +158,29 @@ export function reviewEvidence(result: SurveyResult | null, transcript: Transcri
   if (result.excludedMandatoryFeesDisclosed !== "yes") {
     issues.push({ field: "excluded_fees", severity: "review", message: "Excluded mandatory fees were not clearly disclosed." });
   }
+  return issues;
+}
+
+export function reviewCaseEvidence(item: SurveyCase): EvidenceIssue[] {
+  const issues = reviewEvidence(item.result, item.transcript, item.confidence);
+  const failure = item.failureMessage?.toLowerCase() ?? "";
+  const reach = item.result?.reachOutcome;
+
+  if (failure.includes("declined") && reach && reach !== "refused") {
+    issues.push({
+      field: "terminal_disposition",
+      severity: "block",
+      message: `CALL-E reported a declined call but extracted reach outcome “${reach}”. Treat the disposition as unknown and do not retry automatically.`
+    });
+  }
+  if (item.callStatus === "failed" && reach === "answered") {
+    issues.push({
+      field: "terminal_disposition",
+      severity: "block",
+      message: "CALL-E marked the call failed while the structured result says it was answered. The terminal outcome needs reconciliation."
+    });
+  }
+
   return issues;
 }
 

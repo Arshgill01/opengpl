@@ -4,6 +4,9 @@ OpenGPL is a consent-first CALL-E workbench for nonprofit funeral price survey
 teams. It turns a phone observation into a qualified, transcript-linked review
 record. It does not treat a phone quote as a canonical General Price List.
 
+**Live demo:** https://opengpl.vercel.app — simulation is the default and does
+not place calls.
+
 ![OpenGPL evidence review desk](output/playwright/opengpl-review-desk.png)
 
 The current tracer bullet includes:
@@ -13,6 +16,8 @@ The current tracer bullet includes:
 - a no-call preview of destination, authorization, task, and result contract;
 - realistic simulation fixtures for clear, ambiguous, and contradictory calls;
 - transcript and structured-result cross-checks that can block publication;
+- terminal-disposition checks that block contradictory outcomes such as a
+  declined call extracted as `no_answer`;
 - human approval or follow-up disposition; and
 - server-only CALL-E call creation plus authenticated status reconciliation.
 

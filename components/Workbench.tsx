@@ -8,7 +8,7 @@ import {
   maskPhone,
   parseProviderCsv,
   recipientResultSchema,
-  reviewEvidence,
+  reviewCaseEvidence,
   stableIntentKey,
   type Provider,
   type QueueState,
@@ -89,7 +89,9 @@ function caseFromSdk(provider: Provider, value: unknown, previous: SurveyCase): 
     result,
     transcript,
     reviewDecision: "unreviewed",
-    reviewerNote: ""
+    reviewerNote: "",
+    platformSummary: readString(value.summary),
+    failureMessage: readString(value.failureMessage)
   };
 }
 
@@ -98,7 +100,7 @@ function statusLabel(item: SurveyCase) {
   if (item.reviewDecision === "follow_up") return "Follow-up";
   if (item.callStatus === "calling" || item.callStatus === "queued") return "Call in progress";
   if (!item.result) return "Not called";
-  return reviewEvidence(item.result, item.transcript, item.confidence).length ? "Needs review" : "Ready to approve";
+  return reviewCaseEvidence(item).length ? "Needs review" : "Ready to approve";
 }
 
 function money(value: number) {
@@ -147,7 +149,7 @@ export function Workbench() {
   }, [cases]);
 
   const selected = cases.find((item) => item.provider.id === selectedId) ?? cases[0];
-  const issues = selected ? reviewEvidence(selected.result, selected.transcript, selected.confidence) : [];
+  const issues = selected ? reviewCaseEvidence(selected) : [];
   const blockingIssues = issues.filter((issue) => issue.severity === "block");
   const approvalNeedsNote = issues.length > 0 && selected.reviewerNote.trim().length < 12;
   const visibleCases = cases.filter((item) => {
