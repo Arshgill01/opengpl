@@ -70,7 +70,7 @@ test("call task states disclosure and scope boundaries", () => {
 });
 
 test("calling context uses the recipient's supported region", () => {
-  assert.deepEqual(callingContext("+918437958613"), { region: "IN", locale: "en-IN" });
+  assert.deepEqual(callingContext("+91"), { region: "IN", locale: "en-IN" });
   assert.deepEqual(callingContext("+12025550141"), { region: "US", locale: "en-US" });
 });
 
